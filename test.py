@@ -6,22 +6,15 @@ access = "RKwDQiNOzHkimFdtXaqxL28Nf94DIRwAy7ixzbGX"
 secret = "BhdEHxbux2Oc12ro2VaX5kI7FlfCxidJphcoCiQS"
 
 upbit = pyupbit.Upbit(access, secret)
-print("autotrade start")
 
-# symbols = ["KRW-EOS", "KRW-MBL", "KRW-MFT", "KRW-CRE", "KRW-TT", "KRW-MVL"]
-# target_price = {}
+# 원화시장 전체
+KRW_tickers = pyupbit.get_tickers("KRW")
+buy_tickers = pyupbit.get_tickers("KRW")
+start_ticker = "KRW-BTC"
+k = 0.5
+ticker = "KRW-EOS"
 
-# for symbol in symbols:
-#     df = pyupbit.get_ohlcv(symbol, interval="minute5", count=2)
-#     k = 1 - (abs(df.iloc[-2]['open'] - df.iloc[-2]['close']) / (df.iloc[-2]['high'] - df.iloc[-2]['low']))
-#     target_price[symbol] = df.iloc[-1]['close'] + (df.iloc[-1]['high'] - df.iloc[-1]['low']) * k
-    
+krw = upbit.get_balances()
+data = upbit.buy_market_order(KRW_tickers, krw*0.9995)
 
-# print(target_price)
-
-
-
-
-symbols = ["KRW-EOS", "KRW-MBL", "KRW-MFT", "KRW-CRE", "KRW-TT", "KRW-MVL"]
-coins = pyupbit.get_current_price(symbols)
-print(coins)
+print(krw)
