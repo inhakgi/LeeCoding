@@ -15,6 +15,5 @@ k = 0.5
 ticker = "KRW-EOS"
 
 krw = upbit.get_balances()
-data = upbit.buy_market_order(KRW_tickers, krw*0.9995)
-
-print(krw)
+resp = upbit.buy_market_order(KRW_tickers, 5000)
+print(resp)

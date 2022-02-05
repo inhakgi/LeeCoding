@@ -1,71 +1,54 @@
-import threading
-import queue
 import time
 import pyupbit
 import datetime
-from collections import deque
-import realcoin
+access = "your-access"
+secret = "your-secret"
+def get_target_price(ticker, k):
+    """변동성 돌파 전략으로 매수 목표가 조회"""
+    df = pyupbit.get_ohlcv(ticker, interval="day", count=2)
+    target_price = df.iloc[0]['close'] + (df.iloc[0]['high'] - df.iloc[0]['low']) * k
+    return target_price
+def get_start_time(ticker):
+    """시작 시간 조회"""
+    df = pyupbit.get_ohlcv(ticker, interval="day", count=1)
+    start_time = df.index[0]
+    return start_time
+def get_balance(ticker):
+    """잔고 조회"""
+    balances = upbit.get_balances()
+    for b in balances:
+        if b['currency'] == ticker:
+            if b['balance'] is not None:
+                return float(b['balance'])
+            else:
+                return 0
+    return 0
 
-tickers = ["KRW-ADA", "KRW-LTC"]
+def get_current_price(ticker):
+    """현재가 조회"""
+    return pyupbit.get_orderbook(ticker=ticker)["orderbook_units"][0]["ask_price"]
 
-class Consumer(threading.Thread):
-    def __init__(self, q):
-        super().__init__()
-        self.q = q
-
-        with open("upbit.txt", "r") as f:
-            key0 = f.readline().strip()
-            key1 = f.readline().strip()
-
-        self.u = { }
-        for ticker in tickers:
-            self.u[ticker] = realcoin.Real1Percent(key0, key1, ticker)
-
-    def run(self):
-        price_curr = { }
-        for ticker in tickers:
-            price_curr[ticker] = None
-
-        i = 0
-        while True:
-            try:
-                if not self.q.empty():
-                    price_open = self.q.get()
-                    for ticker in price_open:
-                        self.u[ticker].update(price_open[ticker], price_curr[ticker])
-
-                price_curr = pyupbit.get_current_price(tickers)
-
-                for ticker in tickers:
-                    if self.u[ticker].can_i_buy(price_curr[ticker]) :
-                        self.u[ticker].make_order()
-
-                    if self.u[ticker].can_i_sell():
-                        self.u[ticker].take_order()
-
-                # 1 minutes
-                if i == (5 * 60 * 1):
-                    now = datetime.datetime.now()
-                    for ticker in tickers:
-                        print(f"[{now}] {ticker} : 현재가 {price_curr[ticker]}, 목표가 {self.u[ticker].price_buy}, ma {self.u[ticker].curr_ma15:.2f}/{self.u[ticker].curr_ma50:.2f}/{self.u[ticker].curr_ma120:.2f}, hold_flag {self.u[ticker].hold_flag}, wait_flag {self.u[ticker].wait_flag}")
-                    i = 0
-                i += 1
-            except:
-                print("error")
-
-            time.sleep(0.2)
-
-class Producer(threading.Thread):
-    def __init__(self, q):
-        super().__init__()
-        self.q = q
-
-    def run(self):
-        while True:
-            prices = pyupbit.get_current_price(tickers)
-            self.q.put(prices)
-            time.sleep(60)
-
-q = queue.Queue()
-Producer(q).start()
-Consumer(q).start()
+# 로그인
+upbit = pyupbit.Upbit(access, secret)
+print("autotrade start")
+# 자동매매 시작
+while True:
+    try:
+        now = datetime.datetime.now()
+        start_time = get_start_time("KRW-BTC")
+        end_time = start_time + datetime.timedelta(days=1)
+        if start_time < now < end_time - datetime.timedelta(seconds=10):
+            target_price = get_target_price("KRW-BTC", 0.5)
+            current_price = get_current_price("KRW-BTC")
+            if target_price < current_price:
+                krw = get_balance("KRW")
+                if krw > 5000:
+                    upbit.buy_market_order("KRW-BTC", krw*0.9995)
+        else:
+            btc = get_balance("BTC")
+            if btc > 0.00008:
+                upbit.sell_market_order("KRW-BTC", btc*0.9995)
+        time.sleep(1)
+    except Exception as e:
+        print(e)
+        time.sleep(1)
