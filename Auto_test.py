@@ -6,7 +6,7 @@ import numpy as np
 access = "RKwDQiNOzHkimFdtXaqxL28Nf94DIRwAy7ixzbGX"
 secret = "BhdEHxbux2Oc12ro2VaX5kI7FlfCxidJphcoCiQS"
 
-########################################################################
+#######################################################################
 
 def get_start_time(ticker):
     """시작 시간 조회"""
