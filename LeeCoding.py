@@ -112,7 +112,7 @@ while True:
                 list_coin.remove(best_coin)
                 best_coin, best_k = find_best(list_coin)
         else:
-            btc = get_balance(best_coin[4:])
+            btc = get_balance(best_coin[10:])
             if btc > (5000 / get_current_price(best_coin)):
                 upbit.sell_market_order(best_coin, btc)
                 # 코인 재설정
