@@ -77,7 +77,7 @@ def find_best(list):
         except Exception as e:
             print(e)
     return b_coin, b_k
-#######################################################################
+######################################################################
 
 #암호화폐 목록
 list_coin = pyupbit.get_tickers(fiat="KRW")
