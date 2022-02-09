@@ -3,8 +3,8 @@ import time
 import datetime
 import numpy as np
 
-access = "RKwDQiNOzHkimFdtXaqxL28Nf94DIRwAy7ixzbGX"
-secret = "BhdEHxbux2Oc12ro2VaX5kI7FlfCxidJphcoCiQS"
+access = ""
+secret = ""
 
 #######################################################################
 
